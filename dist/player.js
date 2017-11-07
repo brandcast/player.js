@@ -38,7 +38,7 @@ function getMethodName(prop, type) {
  * @return {boolean}
  */
 function isDomElement(element) {
-    return element instanceof window.HTMLElement;
+    return Boolean(element && element.nodeType === 1 && 'nodeName' in element && element.ownerDocument && element.ownerDocument.defaultView);
 }
 
 /**
@@ -815,7 +815,7 @@ function swapCallbacks(oldElement, newElement) {
  * @module lib/embed
  */
 
-var oEmbedParameters = ['id', 'url', 'width', 'maxwidth', 'height', 'maxheight', 'portrait', 'title', 'byline', 'color', 'autoplay', 'autopause', 'loop', 'responsive', 'speed'];
+var oEmbedParameters = ['id', 'url', 'width', 'maxwidth', 'height', 'maxheight', 'portrait', 'title', 'byline', 'color', 'autoplay', 'autopause', 'loop', 'responsive', 'speed', 'background'];
 
 /**
  * Get the 'data-vimeo'-prefixed attributes from an element as an object.
@@ -1137,6 +1137,8 @@ var Player = function () {
             throw new TypeError('You must pass either a valid element or a valid id.');
         }
 
+        var win = element.ownerDocument.defaultView;
+
         // Already initialized an embed in this div, so grab the iframe
         if (element.nodeName !== 'IFRAME') {
             var iframe = element.querySelector('iframe');
@@ -1182,10 +1184,10 @@ var Player = function () {
                 processData(_this, data);
             };
 
-            if (window.addEventListener) {
-                window.addEventListener('message', onMessage, false);
-            } else if (window.attachEvent) {
-                window.attachEvent('onmessage', onMessage);
+            if (win.addEventListener) {
+                win.addEventListener('message', onMessage, false);
+            } else if (win.attachEvent) {
+                win.attachEvent('onmessage', onMessage);
             }
 
             if (_this.element.nodeName !== 'IFRAME') {
